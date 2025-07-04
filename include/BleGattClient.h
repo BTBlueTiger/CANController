@@ -27,7 +27,7 @@ public:
     ~BleGattClient();
 
     Q_INVOKABLE void startScan();
-    Q_INVOKABLE void connectToDevice(const QBluetoothDeviceInfo &device);
+    Q_INVOKABLE void connectToDevice(const QString &deviceName);
     Q_INVOKABLE void sendCommand();
 
     QList<SimpleBTDevice>  devices() const;;
@@ -56,6 +56,9 @@ private:
     QLowEnergyService *service;
     QLowEnergyCharacteristic ledCharacteristic;
 
+    QBluetoothDeviceInfo findDeviceFromScan(const QString &deviceAdress);
+
+    std::vector<QBluetoothDeviceInfo> vecDeviceInfos;
     QList<SimpleBTDevice> mDevices;
     bool mIsScanning = false;
     bool mOn = false;

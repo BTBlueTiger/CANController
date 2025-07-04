@@ -141,7 +141,7 @@ Rectangle {
                             radius: 5
                         }
                         onClicked: {
-                            bleClient.connectToDevice(model) // Pass the device info to connect
+                            bleClient.connectToDevice(modelData.address) // Pass the device info to connect
                         }
                     }
                 }

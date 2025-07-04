@@ -28,9 +28,19 @@ void BleGattClient::startScan()
     discoveryAgent->start();
 }
 
-void BleGattClient::connectToDevice(const QBluetoothDeviceInfo &device)
+void BleGattClient::connectToDevice(const QString &deviceAdress)
 {
-    controller = QLowEnergyController::createCentral(device, this);
+    qDebug() << "Trying to connect";
+    auto it = std::find_if(vecDeviceInfos.begin(), vecDeviceInfos.end(), [&](const QBluetoothDeviceInfo &d) {
+        return d.address().toString() == deviceAdress;
+    });
+
+    if(it == vecDeviceInfos.end()) {
+        qDebug() << "Device cant be found";
+        return;
+    }
+
+    controller = QLowEnergyController::createCentral(*it, this);
     connect(controller, &QLowEnergyController::connected, this, &BleGattClient::deviceConnected);
     connect(controller, &QLowEnergyController::serviceDiscovered, this, &BleGattClient::serviceDiscovered);
     connect(controller, &QLowEnergyController::disconnected, this, &BleGattClient::deviceDisconnected);
@@ -54,7 +64,9 @@ void BleGattClient::sendCommand()
 void BleGattClient::deviceDiscovered(const QBluetoothDeviceInfo &device)
 {
     qDebug() << "Found device:" << device.name() << device.address().toString();
-    mDevices.append(SimpleBTDevice(device.name(), device.address().toString()));
+    SimpleBTDevice simpleBTDevice(device.name(), device.address().toString());
+    mDevices.append(simpleBTDevice);
+    vecDeviceInfos.emplace_back(device);
     emit devicesChanged();
 }
 void BleGattClient::deviceConnected()
@@ -90,7 +102,7 @@ void BleGattClient::serviceScanDone()
 
 void BleGattClient::serviceStateChanged(QLowEnergyService::ServiceState state)
 {
-    if (state == QLowEnergyService::ServiceDiscovered) {
+    if (state == QLowEnergyService::RemoteServiceDiscovered) {
         qDebug() << "Service discovered.";
         const auto characteristics = service->characteristics();
         for (const auto &characteristic : characteristics) {
