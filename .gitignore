@@ -1,0 +1,55 @@
+# Ignore build directories
+build/
+*.pro.user
+*.qbs.user
+*.pro.user.*
+*.qbs.user.*
+
+# Ignore temporary files
+*.autosave
+*.swp
+*.swo
+*.bak
+*.tmp
+
+# Ignore Qt Creator files
+*.creator.user
+*.creator.user.*
+*.creator.shared
+*.creator.shared.*
+
+# Ignore generated files
+Makefile*
+*.moc
+*.qrc
+*.o
+*.obj
+*.a
+*.so
+*.dll
+*.exe
+*.dSYM
+*.DS_Store
+
+# Ignore Qt resource files
+*.rcc
+
+# Ignore CMake build files
+CMakeLists.txt.user
+CMakeCache.txt
+cmake_install.cmake
+CTestTestfile.cmake
+
+# Ignore generated directories
+bin/
+lib/
+debug/
+release/
+
+# Ignore logs
+*.log
+
+# Ignore IDE-specific files
+.vscode/
+.idea/
+*.iml
