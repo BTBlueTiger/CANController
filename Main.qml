@@ -7,7 +7,6 @@ import "qml"
 
 Window {
 
-    property ButtonManager buttonManager: _buttonManager
     property BLEClient bleClient: _bleClient
 
 

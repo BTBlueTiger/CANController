@@ -3,23 +3,14 @@ import QtQuick.Layouts
 import QtQuick.Controls 2.15
 
 Rectangle {
-
-
     color: "#f0f0f0" // Light background color
 
     Column {
-        width: parent.width
-        height: parent.height
+        y: parent.height * 0.15
+        width: parent.width  // Adjust width relative to the parent
+        height: parent.height * 0.8// Adjust height relative to the parent
         spacing: 20
-        anchors.centerIn: parent
-
-        Text {
-            id: titleText
-            text: "Device Control Panel"
-            font.pixelSize: 36
-            color: "#333333" // Dark text color
-            anchors.horizontalCenter: parent.horizontalCenter
-        }
+    
 
         Rectangle {
             width: 50 // Fixed width for placeholder
@@ -155,16 +146,6 @@ Rectangle {
                     }
                 }
             }
-        }
-
-
-
-        Text {
-            id: stateText
-            text: buttonManager.State ? "Device State: ON" : "Device State: OFF"
-            font.pixelSize: 24
-            color: "#333333" // Dark text color
-            anchors.horizontalCenter: parent.horizontalCenter
         }
     }
 }

@@ -1,5 +1,3 @@
-#include "include/ButtonManager.h"
-#include "include/BluetoothManager.h"
 #include "include/BleGattClient.h"
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
@@ -12,14 +10,9 @@ int main(int argc, char *argv[])
 
     qRegisterMetaType<SimpleBTDevice>("SimpleBTDevice");
 
-    qmlRegisterType<ButtonManager>("CanController", 1, 0, "ButtonManager");
     qmlRegisterType<BleGattClient>("CanController", 1, 0, "BLEClient");
     
-
-    ButtonManager buttonManager;
-    BluetoothManager btManager;
     BleGattClient bleClient;
-    engine.rootContext()->setContextProperty("_buttonManager", &buttonManager);
     engine.rootContext()->setContextProperty("_bleClient", &bleClient);
 
     QObject::connect(
