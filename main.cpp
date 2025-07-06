@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
 
     qRegisterMetaType<SimpleBTDevice>("SimpleBTDevice");
 
-    qmlRegisterType<BleGattClient>("CanController", 1, 0, "BLEClient");
+    qmlRegisterType<BleGattClient>("CANController", 1, 0, "BLEClient");
     
     BleGattClient bleClient;
     engine.rootContext()->setContextProperty("_bleClient", &bleClient);
