@@ -2,11 +2,14 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QQuickStyle>
 
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
     QQmlApplicationEngine engine;
+
+    QQuickStyle::setStyle("Basic");
 
     qRegisterMetaType<SimpleBTDevice>("SimpleBTDevice");
 
@@ -22,6 +25,7 @@ int main(int argc, char *argv[])
         []() { QCoreApplication::exit(-1); },
         Qt::QueuedConnection);
     engine.loadFromModule("CANController", "Main");
+
 
     return app.exec();
 }

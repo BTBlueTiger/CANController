@@ -45,15 +45,14 @@ private slots:
     void deviceConnected();
     void serviceDiscovered(const QBluetoothUuid &uuid);
     void serviceScanDone();
-    void serviceStateChanged(QLowEnergyService::ServiceState state);
-    void characteristicRead(const QLowEnergyCharacteristic &characteristic, const QByteArray &value);
-    void characteristicChanged(const QLowEnergyCharacteristic &characteristic, const QByteArray &value);
+    void serviceStateChanged(QLowEnergyService* service, QLowEnergyService::ServiceState state);
+    void characteristicRead(QLowEnergyService* service, const QLowEnergyCharacteristic &characteristic, const QByteArray &value);
+    void characteristicChanged(QLowEnergyService* service, const QLowEnergyCharacteristic &characteristic, const QByteArray &value);
     void deviceDisconnected();
 
 private:
     QBluetoothDeviceDiscoveryAgent *discoveryAgent;
     QLowEnergyController *controller;
-    QLowEnergyService *service;
     QLowEnergyCharacteristic ledCharacteristic;
 
     QBluetoothDeviceInfo findDeviceFromScan(const QString &deviceAdress);

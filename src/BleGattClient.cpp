@@ -49,6 +49,7 @@ void BleGattClient::connectToDevice(const QString &deviceAdress)
 
 void BleGattClient::sendCommand()
 {
+    /*
     if (ledCharacteristic.isValid()) {
         QByteArray value;
         value.append(mOn ? 0 : 1); // 1 for "on", 0 for "off"
@@ -59,6 +60,7 @@ void BleGattClient::sendCommand()
     } else {
         qDebug() << "LED characteristic not found.";
     }
+    */
 }
 
 void BleGattClient::deviceDiscovered(const QBluetoothDeviceInfo &device)
@@ -79,16 +81,30 @@ void BleGattClient::deviceConnected()
 void BleGattClient::serviceDiscovered(const QBluetoothUuid &uuid)
 {
     qDebug() << "Service discovered:" << uuid.toString();
-    service = controller->createServiceObject(uuid, this);
+    QLowEnergyService* service = controller->createServiceObject(uuid, this);
     if (service) {
-        connect(service, &QLowEnergyService::stateChanged, this, &BleGattClient::serviceStateChanged);
-        connect(service, &QLowEnergyService::characteristicRead, this, &BleGattClient::characteristicRead);
+        qDebug() << "Service name:" << service->serviceName();
+        connect(service, &QLowEnergyService::stateChanged, [service, this](QLowEnergyService::ServiceState state)
+        {
+            serviceStateChanged(service, state);
+        });
+
+        connect(service, &QLowEnergyService::characteristicRead, [service, this](const auto &characteristic, const auto &value)
+        {
+            characteristicRead(service, characteristic, value);
+        });
+
+        connect(service, &QLowEnergyService::characteristicChanged, [service, this](const auto &characteristic, const auto &value)
+        {
+            characteristicChanged(service, characteristic, value);
+        });
         service->discoverDetails();
     }
 }
 
 void BleGattClient::serviceScanDone()
 {
+    /*
     qDebug() << "Service scan done.";
     const auto services = controller->services();
     for (const auto &serviceUuid : services) {
@@ -98,32 +114,32 @@ void BleGattClient::serviceScanDone()
             service->discoverDetails();
         }
     }
+    */
 }
 
-void BleGattClient::serviceStateChanged(QLowEnergyService::ServiceState state)
+void BleGattClient::serviceStateChanged(QLowEnergyService* service, QLowEnergyService::ServiceState state)
 {
     if (state == QLowEnergyService::RemoteServiceDiscovered) {
-        qDebug() << "Service discovered.";
-        const auto characteristics = service->characteristics();
+        qDebug() << "Characteristics of service:" << service->serviceName() << service->serviceUuid() << ":";
+        auto characteristics = service->characteristics();
         for (const auto &characteristic : characteristics) {
-            qDebug() << "Characteristic:" << characteristic.uuid().toString();
+            //qDebug() << "\tCharacteristic:" << characteristic.uuid().toString();
             service->readCharacteristic(characteristic);
         }
     }
 }
 
-void BleGattClient::characteristicRead(const QLowEnergyCharacteristic &characteristic, const QByteArray &value)
+void BleGattClient::characteristicRead(QLowEnergyService* service, const QLowEnergyCharacteristic &characteristic, const QByteArray &value)
 {
-    qDebug() << "Characteristic read:" << characteristic.uuid().toString();
-    qDebug() << "Value:" << value;
+    qDebug() << "\t" << characteristic.name() << characteristic.uuid().toString() << "Value:" << value << "from service" << service->serviceUuid();
 
-    QString descriptorValue = QString::fromUtf8(value);
-    qDebug() << "Descriptor Value:" << descriptorValue;
+    //QString descriptorValue = QString::fromUtf8(value);
+    //qDebug() << "\tDescriptor Value:" << descriptorValue;
 }
 
-void BleGattClient::characteristicChanged(const QLowEnergyCharacteristic &characteristic, const QByteArray &value)
+void BleGattClient::characteristicChanged(QLowEnergyService* service, const QLowEnergyCharacteristic &characteristic, const QByteArray &value)
 {
-    qDebug() << "Characteristic changed:" << characteristic.uuid().toString() << value;
+    qDebug() << "Characteristic changed." << characteristic.uuid().toString() << value;
 }
 
 void BleGattClient::deviceDisconnected()
