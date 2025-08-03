@@ -28,7 +28,7 @@ public:
 
     Q_INVOKABLE void startScan();
     Q_INVOKABLE void connectToDevice(const QString &deviceName);
-    Q_INVOKABLE void sendCommand();
+    Q_INVOKABLE void sendCommand(int value);
 
     QList<SimpleBTDevice>  devices() const;;
     bool isScanning() const;
@@ -62,6 +62,7 @@ private:
     QList<SimpleBTDevice> mDevices;
     bool mIsScanning = false;
     bool mOn = false;
+    bool mIsConnected = false;
 };
 
 #endif // BLE_GATT_CLIENT_H

@@ -14,10 +14,11 @@ BleGattClient::BleGattClient(QObject *parent)
 BleGattClient::~BleGattClient()
 {
     if (controller) {
-        controller->disconnectFromDevice(); // Explicitly disconnect from the BLE device
-        delete controller; // Clean up the controller object
+        controller->disconnectFromDevice();
+        controller->deleteLater();
     }
-    delete discoveryAgent; // Clean up the discovery agent
+    discoveryAgent->stop();
+    discoveryAgent->deleteLater();
 }
 
 void BleGattClient::startScan()
@@ -35,6 +36,7 @@ void BleGattClient::connectToDevice(const QString &deviceAdress)
         return d.address().toString() == deviceAdress;
     });
 
+
     if(it == vecDeviceInfos.end()) {
         qDebug() << "Device cant be found";
         return;
@@ -47,17 +49,13 @@ void BleGattClient::connectToDevice(const QString &deviceAdress)
     controller->connectToDevice();
 }
 
-void BleGattClient::sendCommand()
+void BleGattClient::sendCommand(int value)
 {
     if (ledCharacteristic.isValid()) {
-        QByteArray value;
-        value.append(mOn ? 0 : 1); // 1 for "on", 0 for "off"
-        service->writeCharacteristic(ledCharacteristic, value, QLowEnergyService::WriteWithoutResponse);
-        qDebug() << "Command sent:" << (!mOn ? "ON" : "OFF");
-        mOn = !mOn;
-        emit onChanged();
-    } else {
-        qDebug() << "LED characteristic not found.";
+        QByteArray byteArray;
+        byteArray.append(value); // 1 for "on", 0 for "off"
+        service->writeCharacteristic(ledCharacteristic, byteArray, QLowEnergyService::WriteWithoutResponse);
+        qDebug() << "Command sent:" << value << " %";
     }
 }
 
@@ -73,7 +71,10 @@ void BleGattClient::deviceConnected()
 {
     qDebug() << "Device connected.";
     controller->discoverServices();
+    mIsScanning = false;
+    mIsConnected = true;
     emit isDeviceConnectedChanged();
+    emit isScanningChanged();
 }
 
 void BleGattClient::serviceDiscovered(const QBluetoothUuid &uuid)
@@ -107,6 +108,13 @@ void BleGattClient::serviceStateChanged(QLowEnergyService::ServiceState state)
         const auto characteristics = service->characteristics();
         for (const auto &characteristic : characteristics) {
             qDebug() << "Characteristic:" << characteristic.uuid().toString();
+            // Set ledCharacteristic to the desired one, e.g. by UUID:
+            if (characteristic.uuid().toString().toLower() == "{000000ff-0000-1000-8000-00805f9b34fb}") {
+
+
+                ledCharacteristic = characteristic;
+                qDebug() << "Steering characteristic found and set!";
+            }
             service->readCharacteristic(characteristic);
         }
     }
@@ -139,7 +147,7 @@ bool BleGattClient::isScanning() const
 
 bool BleGattClient::isDeviceConnected() const
 {
-    return controller && controller->state() == QLowEnergyController::ConnectedState;
+    return mIsConnected;
 }
 
 QList<SimpleBTDevice>  BleGattClient::devices() const

@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
-
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
 project(CANController VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -17,11 +19,13 @@ qt_add_executable(appCANController
 # Define a prefix for include directories
 set(INCLUDE_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/include)
 set(SRC_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/src)
+set(QML_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/qml)
 
 file(GLOB SOURCE_FILES
     ${INCLUDE_PREFIX}/*.h
     ${SRC_PREFIX}/*.cpp
 )
+
 
 # Add QML module
 qt_add_qml_module(appCANController
@@ -29,12 +33,13 @@ qt_add_qml_module(appCANController
     VERSION 1.0
     QML_FILES
         Main.qml
+        qml/FindDevicesScreen.qml
+        qml/ServoService.qml
+        qml/DeviceControl.qml
     SOURCES
-        ${HEADERS_FILES} ${SOURCE_FILES}
-        QML_FILES qml/FindDevicesScreen.qml
-        SOURCES include/SimpleBTDevice.h
-        QML_FILES qml/DeviceControl.qml
-
+        ${SOURCE_FILES}
+        SOURCES include/SDLController.h
+        SOURCES src/SDLController.cpp
 
 )
 
@@ -50,6 +55,12 @@ set_target_properties(appCANController PROPERTIES
 target_link_libraries(appCANController
     PRIVATE Qt6::Quick Qt6::Bluetooth
 )
+
+set(SDL2_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib/SDL/")  # z. B. /usr/include/SDL2
+include_directories(${SDL2_DIR}/include)
+link_directories(${SDL2_DIR}/lib)
+target_link_libraries(appCANController PRIVATE SDL2)
+
 
 # Install rules
 include(GNUInstallDirs)
